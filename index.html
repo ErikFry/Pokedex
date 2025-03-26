@@ -26,7 +26,7 @@
             let cardName = setName +'-'+index;
             console.log(cardName);
             const card = await tcgdex.fetch('cards', cardName);
-            document.getElementById("wrapper").innerHTML+= '<div class="border-2 border-gray-300 p-2 bg-white rounded-lg shadow-md"><img src="'+card.image+'/high.png" alt="Pokemon Card" class="w-full"></div>';
+            document.getElementById("wrapper").innerHTML+= '<div class="border-2 border-gray-300 p-2 bg-white rounded-lg shadow-md"><img src="'+card.image+'/low.png" alt="Pokemon Card" class="w-full"></div>';
           }
            })();
         
