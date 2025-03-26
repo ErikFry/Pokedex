@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Pokémon Card Grid</title>
+</head>
+<body class="bg-gray-100 p-5">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-2xl font-bold text-center mb-4">Pokémon Card Collection</h1>
+        <div class="grid grid-cols-5 gap-4" id="wrapper">
+           
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@tcgdex/sdk@2/dist/tcgdex.browser.js"></script>
+    <script>
+        // Instantiate the SDK
+        const tcgdex = new TCGdex('en');
+        let kort;
+        // go into an async context
+        ;(async () => {
+          // Card will be Furret from the Darkness Ablaze Set
+          for (let index = 1; index < 201; index++) {
+            let setName = "swsh3"
+            let cardName = setName +'-'+index;
+            console.log(cardName);
+            const card = await tcgdex.fetch('cards', cardName);
+            document.getElementById("wrapper").innerHTML+= '<div class="border-2 border-gray-300 p-2 bg-white rounded-lg shadow-md"><img src="'+card.image+'/high.png" alt="Pokemon Card" class="w-full"></div>';
+          }
+           })();
+        
+
+      </script>
+   
+</body>
+</html>
