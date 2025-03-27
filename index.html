@@ -20,14 +20,27 @@
         let kort;
         // go into an async context
         ;(async () => {
-          // Card will be Furret from the Darkness Ablaze Set
-          for (let index = 1; index < 201; index++) {
-            let setName = "swsh3"
-            let cardName = setName +'-'+index;
-            console.log(cardName);
+          const sets = await tcgdex.fetch('sets');
+          console.log(sets);
+          for (let i = 166; i <= 180; i++) {         
+          let setName = sets[i].id;
+          for (let index = 1; index < sets[i].cardCount.total; index++) {
+            let cardNr = index;
+            if(cardNr< 10){
+              cardNr = "00"+ cardNr;
+            }else if(cardNr<= 99){
+              cardNr = "0"+ cardNr;
+            }
+            let cardName = setName +'-'+cardNr;
+//           console.log(cardName);
             const card = await tcgdex.fetch('cards', cardName);
-            document.getElementById("wrapper").innerHTML+= '<div class="border-2 border-gray-300 p-2 bg-white rounded-lg shadow-md"><img src="'+card.image+'/low.png" alt="Pokemon Card" class="w-full"></div>';
-          }
+            //console.log(card);
+            //document.getElementById("wrapper").innerHTML+= '<div class="border-2 border-gray-300 p-2 bg-white rounded-lg shadow-md"><img src="'+card.image+'/low.png" alt="Pokemon Card" class="w-full"></div>';
+            if((card.rarity.includes("Special illustration rare") || card.rarity.includes("BRare")) && card.rarity.includes(" ") && !card.rarity.includes("Holo")){
+            console.log(card.rarity);
+          
+           document.getElementById("wrapper").innerHTML+= '<div class="border-2 border-gray-300 p-2 bg-white rounded-lg shadow-md"><img src="'+card.image+'/low.png" alt="Pokemon Card" class="w-full"></div>';
+          }}}
            })();
         
 
