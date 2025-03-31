@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Pokémon Card Grid</title>
+</head>
+<body class="bg-gray-100 p-5">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-2xl font-bold text-center mb-4">Build your dream PokeDex TCG</h1>
+        <div class="grid grid-cols-5 gap-4" id="wrapper">
+           
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@tcgdex/sdk@2/dist/tcgdex.browser.js"></script>
+    <script src="pokemon.js"></script>
+    <script src="hitRates.js"></script>
+    <script>
+        // Instantiate the SDK
+        
+        const tcgdex = new TCGdex('en');
+        let kort;
+        let setCardCount = 10;
+        let activeCard;
+        let completeSet = [
+        {name:"Common", cards: []},
+        {name:"Uncommon", cards: []},
+        {name:"Rare", cards: []},
+        {name:"Double rare", cards: []},
+        {name:"Ultra Rare", cards: []},
+        {name:"Illustration rare", cards: []},
+        {name:"Special illustration rare", cards: []},
+        {name:"Hyper rare", cards: []},    
+        {name:"FoilEnergy", cards: []},
+        ];
+        // go into an async context
+        ;(async () => {
+          const sets = await tcgdex.fetch('sets');
+          console.log(sets);
+          const series = await tcgdex.fetch('series');
+          console.log(series);
+          const card = await tcgdex.fetch('cards');
+          kort = card;
+          const set = await tcgdex.fetch('sets', 'sv03.5');
+          console.log(card[151]);
+          const res = await tcgdex.fetch('rarities')
+          console.log(res);
+            for (let index = 1; index < 208; index++) {
+                let card;
+                if(index<10){
+                    let cardNr = "sv03.5-00"+index;
+                    card = await tcgdex.fetch('cards', cardNr);
+                }else if(index<100){
+                    let cardNr = "sv03.5-0"+index;
+                    card = await tcgdex.fetch('cards', cardNr);
+                }else{
+                    let cardNr = "sv03.5-"+index;
+                    card = await tcgdex.fetch('cards', cardNr);
+                }
+                if(card.rarity == "Common"){
+                    completeSet[0].cards.push(card);
+                }else if(card.rarity == "Uncommon"){
+                    completeSet[1].cards.push(card);
+                }else if(card.rarity == "Rare"){
+                    completeSet[2].cards.push(card);
+                }else if(card.rarity == "Double rare"){
+                    completeSet[3].cards.push(card);
+                }else if(card.rarity == "Ultra Rare"){
+                    completeSet[4].cards.push(card);
+                }else if(card.rarity == "Illustration rare"){
+                    completeSet[5].cards.push(card);
+                }else if(card.rarity == "Special illustration rare"){
+                    completeSet[6].cards.push(card);
+                }else if(card.rarity == "Hyper rare"){
+                    completeSet[7].cards.push(card);
+                }
+            }
+            console.log(completeSet)
+           })();
+        
+        function buildSite(array){
+            for (let index = 1; index <= array.length; index++) {
+                if(index<10){
+                    document.getElementById("wrapper").innerHTML+= '<div class="border-2 border-gray-300 p-2 bg-white rounded-lg shadow-md cardDiv"><img src="https://assets.tcgdex.net/en/sv/sv03/229/low.png" alt="Pokemon Card" class="w-full" id="00'+index+'"></div>';
+                }else if(index<100){
+                    document.getElementById("wrapper").innerHTML+= '<div class="border-2 border-gray-300 p-2 bg-white rounded-lg shadow-md cardDiv"><img src="https://assets.tcgdex.net/en/sv/sv03/229/low.png" alt="Pokemon Card" class="w-full" id="0'+index+'"></div>';
+                }else{
+                document.getElementById("wrapper").innerHTML+= '<div class="border-2 border-gray-300 p-2 bg-white rounded-lg shadow-md cardDiv"><img src="https://assets.tcgdex.net/en/sv/sv03/229/low.png" alt="Pokemon Card" class="w-full" id="'+index+'"></div>';
+            }
+            }
+        }
+        buildSite(pokemons);
+        /* Putting in event listeners into the images of the cards.
+        Idea - Clicking a card will pull up a "menu" where you can choose from ALL of the tcg
+        cards from each pokemon. */
+        function generatePack(){
+            let pack = [];
+            /* Common Cards  - Can get duplicates atm cards 1-4*/
+            for (let index = 0; index < 4; index++) {
+                pack.push(completeSet[0].cards[Math.floor(Math.random()*completeSet[0].cards.length)])
+            }
+            /* Uncommon Cards  - Can get duplicates atm cards 5-7*/
+            for (let index = 0; index < 3; index++) {
+                pack.push(completeSet[1].cards[Math.floor(Math.random()*completeSet[1].cards.length)])
+            }
+            /* Slot 8 reverse holo - Can be common, uncommon or rare. the odds are the same so in this set its 1/153 chances */
+            let slot8 = Math.floor(Math.random()*153);
+            console.log(slot8)
+            if(slot8<=65){
+                pack.push(completeSet[0].cards[slot8])
+            }else if(slot8>65 && slot8<=127){
+                pack.push(completeSet[1].cards[slot8-completeSet[0].cards.length])
+            }else{
+                pack.push(completeSet[2].cards[slot8-(completeSet[0].cards.length+completeSet[1].cards.length)])
+            }
+            /* Slot 9 reverse holo - --||-- , or Illustration rare, Special illustration rare and hyper rare */
+            let luckOfTheDraw1 = Math.random();
+            console.log(luckOfTheDraw1);
+            let slot9 = Math.floor(Math.random()*153);
+            if(luckOfTheDraw1 < hitRates[3].chance){ //Illustration rare
+                console.log(hitRates[3].name)
+                pack.push(completeSet[5].cards[Math.floor(Math.random()*completeSet[5].cards.length)])
+            }else if(luckOfTheDraw1 > hitRates[3].chance && luckOfTheDraw1 < (hitRates[3].chance+hitRates[4].chance)){ //SIR
+                console.log(hitRates[4].name)
+                pack.push(completeSet[6].cards[Math.floor(Math.random()*completeSet[6].cards.length)])
+            }else if(luckOfTheDraw1 > (hitRates[3].chance+hitRates[4].chance) && luckOfTheDraw1 < (hitRates[3].chance+hitRates[4].chance+hitRates[5].chance)){//HR
+                console.log(hitRates[5].name)
+                pack.push(completeSet[7].cards[Math.floor(Math.random()*completeSet[7].cards.length)])
+            }else{
+                if(slot9<=65){
+                    pack.push(completeSet[0].cards[slot9])
+                }else if(slot9>65 && slot9<=127){
+                    pack.push(completeSet[1].cards[slot9-completeSet[0].cards.length])
+                }else{
+                    pack.push(completeSet[2].cards[slot9-(completeSet[0].cards.length+completeSet[1].cards.length)])
+                }
+            }
+            /* Slot 10 holo rare, or Double rares and Ultra rares*/
+            let luckOfTheDraw2 = Math.random();
+            console.log(luckOfTheDraw2);
+            if(luckOfTheDraw2 < hitRates[0].chance){ //Illustration rare
+                console.log(hitRates[0].name)
+                pack.push(completeSet[3].cards[Math.floor(Math.random()*completeSet[3].cards.length)])
+            }else if(luckOfTheDraw2 > hitRates[0].chance && luckOfTheDraw2 < (hitRates[0].chance+hitRates[1].chance)){ //SIR
+                console.log(hitRates[1].name)
+                pack.push(completeSet[4].cards[Math.floor(Math.random()*completeSet[4].cards.length)])
+            }else{
+            pack.push(completeSet[2].cards[Math.floor(Math.random()*completeSet[2].cards.length)])
+            }
+
+
+
+
+            /* Slot 11 Energy card  */
+         
+            console.log(pack)
+            showPack(pack);
+
+        }
+        function showPack(pack){
+            let cardPoolEl = document.getElementById("overlay");
+            let cardGridEl = document.getElementById("griddy");
+            cardGridEl.innerHTML = "";
+            console.log(pack)
+            pack.forEach(element => {
+                console.log(element.image);
+                if(element.image != undefined){
+                cardGridEl.innerHTML+= '<div class="border-2 border-gray-300 p-2 bg-white rounded-lg shadow-md poolDiv"><img src="'+element.image+'/low.png" alt="Pokemon Card" class="w-full"></div>';
+            }
+            });
+            cardPoolEl.style.display = "block"; //View overlay
+            /* Scrolls to top when chosen card */
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        }
+
+
+
+        function closeOverlay(){
+            document.getElementById("overlay").style.display = "none";
+        }
+
+      </script>
+      <div class="max-w-4xl mx-auto" id="overlay">
+        <h1 class="text-2xl font-bold text-center mb-4">Open a 151 pack! <button onclick="generatePack()">Open!</button> <a href="#" class="close-btn" onclick="closeOverlay()">&times;</a></h1>
+        
+        <div class="grid grid-cols-5 gap-4" id="griddy">
+           
+        </div>
+    </div>
+    
+</body>
+</html>

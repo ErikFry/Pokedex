@@ -1,0 +1,29 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+/* Hidden overlay initially */
+#overlay {
+    display: none;
+    position: absolute;
+top: 0;
+left: 0;
+right: 0;
+margin: auto;
+    width: 100%;
+    height: auto;
+    background: rgba(0, 0, 0, 0.95);
+    color: white;
+    
+}
+
+/* Show overlay when targeted */
+
+.close-btn {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-size: 30px;
+    text-decoration: none;
+    color: white;
+}

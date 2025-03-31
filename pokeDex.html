@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Pokémon Card Grid</title>
+</head>
+<body class="bg-gray-100 p-5">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-2xl font-bold text-center mb-4">Build your dream PokeDex TCG</h1>
+        <div class="grid grid-cols-5 gap-4" id="wrapper">
+           
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@tcgdex/sdk@2/dist/tcgdex.browser.js"></script>
+    <script src="pokemon.js"></script>
+    <script>
+        // Instantiate the SDK
+        let pokeDex = [{id:1, name:"Bulbasaur"},{id:2, name:"Ivysaur"}]
+        const tcgdex = new TCGdex('en');
+        let kort;
+        let setCardCount = 10;
+        let activeCard;
+        // go into an async context
+        ;(async () => {
+          const sets = await tcgdex.fetch('sets');
+          console.log(sets);
+          const series = await tcgdex.fetch('series');
+          console.log(series);
+          const card = await tcgdex.fetch('cards');
+          kort = card;
+          let test = card.filter(item => item.name.indexOf("Bulbasaur") !== -1);
+          console.log(card[10]);
+          console.log(test);
+           })();
+        
+        function buildSite(array){
+            for (let index = 1; index <= array.length; index++) {
+                if(index<10){
+                    document.getElementById("wrapper").innerHTML+= '<div class="border-2 border-gray-300 p-2 bg-white rounded-lg shadow-md cardDiv"><img src="https://assets.tcgdex.net/en/sv/sv03/229/low.png" alt="Pokemon Card" class="w-full" id="00'+index+'"></div>';
+                }else if(index<100){
+                    document.getElementById("wrapper").innerHTML+= '<div class="border-2 border-gray-300 p-2 bg-white rounded-lg shadow-md cardDiv"><img src="https://assets.tcgdex.net/en/sv/sv03/229/low.png" alt="Pokemon Card" class="w-full" id="0'+index+'"></div>';
+                }else{
+                document.getElementById("wrapper").innerHTML+= '<div class="border-2 border-gray-300 p-2 bg-white rounded-lg shadow-md cardDiv"><img src="https://assets.tcgdex.net/en/sv/sv03/229/low.png" alt="Pokemon Card" class="w-full" id="'+index+'"></div>';
+            }
+            }
+        }
+        buildSite(pokemons);
+        /* Putting in event listeners into the images of the cards.
+        Idea - Clicking a card will pull up a "menu" where you can choose from ALL of the tcg
+        cards from each pokemon. */
+        function changeCard(){
+        let clickableCards = document.querySelectorAll(".cardDiv");
+        clickableCards.forEach(cardDiv => {
+            cardDiv.addEventListener('click', function handleClick(event) {
+            activeCard = event.target;
+            cardDiv.setAttribute('style', 'background-color: yellow;');
+            chooseNewCard(activeCard);
+            });
+        });
+        console.log(clickableCards.target);
+        
+        }
+        changeCard();
+        function chooseNewCard(target){
+            buildPool(pokemons[parseInt(target.id)-1].name)
+        }
+        function buildPool(pokemon){
+            let cards = kort.filter(item => item.name.indexOf(pokemon) !== -1);
+            let cardPoolEl = document.getElementById("overlay");
+            let cardGridEl = document.getElementById("griddy");
+            cardGridEl.innerHTML = "";
+            console.log(cards)
+            cards.forEach(element => {
+                console.log(element.image);
+                if(element.image != undefined){
+                cardGridEl.innerHTML+= '<div class="border-2 border-gray-300 p-2 bg-white rounded-lg shadow-md poolDiv"><img src="'+element.image+'/low.png" alt="Pokemon Card" class="w-full" id="'+pokemon+'"></div>';
+            }
+            });
+            cardPoolEl.style.display = "block"; //View overlay
+            pickCard(); //adding event listeners
+            /* Scrolls to top when chosen card */
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        }
+        /* Making the function that changes the card that you picked in the overlay
+        Adding it purely into the html */
+        function pickCard(){
+        let clickableCards = document.querySelectorAll(".poolDiv");
+        clickableCards.forEach(poolDiv => {
+            poolDiv.addEventListener('click', function handleClick(event) {
+                //console.log(poolDiv.firstElementChild.src);
+                activeCard.src = poolDiv.firstElementChild.src;
+                //console.log("test");
+                document.getElementById("overlay").style.display = "none";
+                /* Scrolls to top when chosen card */
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+            });
+        });
+        
+        }
+        
+        function closeOverlay(){
+            document.getElementById("overlay").style.display = "none";
+        }
+
+
+      </script>
+      <div class="max-w-4xl mx-auto" id="overlay">
+        <h1 class="text-2xl font-bold text-center mb-4">Build your dream PokeDex TCG <a href="#" class="close-btn" onclick="closeOverlay()">&times;</a></h1>
+        
+        <div class="grid grid-cols-5 gap-4" id="griddy">
+           
+        </div>
+    </div>
+    
+</body>
+</html>
